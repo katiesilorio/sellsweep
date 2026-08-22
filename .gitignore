@@ -45,3 +45,6 @@ sales_log.csv
 
 # Operational handoff. Names the seller. Private repo only.
 HANDOFF.md
+
+# Local working context. Never synced to GitHub.
+CLAUDE.md

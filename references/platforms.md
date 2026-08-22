@@ -65,9 +65,23 @@ Up to 5 questions. Types: `text_input`, `dropdown`, `unlabeled_upload`, `labeled
 
 **Images:** `CreateCatalogImage` (multipart), attached by `object_id`. Use `image_ids` - `ecom_uri` and `ecom_image_uris` are deprecated.
 
-**⚠️ Online visibility is not settable via API.** `CatalogItem.channels` is read-only, and `ecom_visibility` is undocumented. The only known path is a one-time **Dashboard → Items & Orders → Settings → item defaults** configuration setting new items to **Listed** and assigning them to the Square Online site. **This is unverified and has reliability complaints - test it empirically before relying on it** (see the test protocol in the planning doc). If it fails, Square degrades to "creates the item, user flips visibility manually."
+**Online visibility: not settable, and not something you need to set.** The earlier version of this section was wrong and produced bad instructions to the seller. Corrected 2026-08-22 after creating a 29-variation item through `batchUpsertCatalogObjects` and checking the live storefront.
 
-Additional requirements for an item to actually be buyable online, all outside the Catalog API: assigned to an online sales channel, every variation priced, stock tracked, fulfillment methods configured, and **the user must click Publish** in the site editor.
+What was verified:
+
+- **The item went live on the Square Online site with no dashboard step at all.** No "set to Listed", no Publish in the site editor. It was searchable and purchasable within seconds of the API call, with the variation dropdown, per-variation photos, and stock counts all working.
+- The item's Channels panel already had the Square Online site checked and "Hide item from browsing & search on websites" off, by default, from the API create.
+- **Square removed the Listed / Unavailable model.** Its own note in that panel reads: "We've changed how to remove items from your website. Instead of marking items as Unavailable, deselect the website above." Any instruction written against the old UI will not match what the seller sees, which is exactly how this section went stale.
+
+What is still true: `CatalogItem` exposes no writable visibility field. `channels` is documented read only, and Square staff confirmed on the developer forum that the `ecom` fields "are read only and aren't documented even though they are returned in the API response." So visibility cannot be changed through the API. It also does not need to be, because a new item defaults to visible.
+
+**Never tell the seller to go flip a switch before checking whether one is needed.** Hit the storefront, or `GET /v2/catalog/object/{id}` and read the returned `channels`. The item is probably already live.
+
+**`batchUpsertCatalogObjects` returns variations nested, not flat.** When variations are sent inside `item_data.variations`, they come back inside the returned ITEM, and `objects[]` contains no top-level `ITEM_VARIATION` entries. Counting top-level variations returns zero, which looks like a failed create and is not. Read `object.item_data.variations`. Getting this wrong also hands the follow-up inventory call an empty `changes` array, which fails with `VALUE_EMPTY`.
+
+**Per-variation images work.** `CatalogItemVariation` accepts `image_ids`, verified with 29 variations each carrying its own photo; the storefront swaps the image when the buyer picks a variation. Upload with `CreateCatalogImage` first (no `object_id`), collect the returned ids, then reference them per variation in the batch upsert. Item-level `image_ids` and per-variation `image_ids` can both be set on the same item.
+
+Still outside the Catalog API and still required for an item to transact: every variation priced, stock tracked, and fulfillment methods configured for the site.
 
 **Custom-order capable listings:** `CatalogModifierList` with `modifier_type: "TEXT"` (fields `max_length`, `text_required`) captures buyer-entered text at checkout. Works on Square Online; **not** on Payment Links. Note for the user at setup: the entered text is **not retrievable via the Orders API** - they'll read it off the order ticket or receipt. Verify with one real test order.
 
