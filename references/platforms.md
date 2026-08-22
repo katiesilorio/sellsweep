@@ -1,0 +1,99 @@
+# Platforms
+
+## eBay - API
+
+**Use the Trading API `AddFixedPriceItem`, not the Inventory API.**
+
+Why: listings created through the Inventory API **cannot be edited in Seller Hub** - every revision must go back through the API, and eBay's own advice for a stuck listing is to end and relist, losing watchers and item history. Trading listings stay ordinary eBay listings the user can fix from their phone. A 30-variation listing is also **one** Trading call versus ~6 Inventory calls plus one-time setup of a merchant location and three business policies.
+
+**Two operational constraints:**
+
+1. **Never call the Inventory API on the production account.** Doing so opts the account into Business Policies *account-wide*, after which `AddFixedPriceItem` stops accepting inline `ShippingDetails` / `ReturnPolicy` / `PaymentMethods` and requires `SellerProfiles` IDs instead. Check `SellerProfileOptedIn` via `GetUserPreferences` before starting. Experiment in sandbox only.
+2. **Images: use the Media API.** `UploadSiteHostedPictures` was decommissioned 2026-09-30. Use `createImageFromFile` / `createImageFromUrl`; the returned EPS URL drops into `Item.PictureDetails.PictureURL`. A single listing **cannot mix** EPS-hosted and self-hosted URLs.
+
+**Business Policies - check the account state first.** This changes field mapping, not API choice:
+
+| Account state | `AddFixedPriceItem` uses |
+|---|---|
+| Opted in | `Item.SellerProfiles` → `SellerShippingProfile`, `SellerReturnProfile`, `SellerPaymentProfile` IDs |
+| Not opted in | Inline `ShippingDetails`, `ReturnPolicy`, `PaymentMethods` |
+
+Check via `GetUserPreferences` with `ShowSellerProfilePreferences=true` → `SellerProfilePreferences.SellerProfileOptedIn`, or in the UI at My eBay → Account → Business Policies. Both states work fine; just branch the mapping.
+
+**Auth:** OAuth 2.0 user token (recommended over legacy Auth'n'Auth). Pass to Trading via the `X-EBAY-API-IAF-TOKEN` header rather than the `<eBayAuthToken>` element. The Media API requires OAuth regardless.
+
+**Variations:** `Item.Variations` / `Variations.Variation`. Max 250 variations, 5 variation detail sets, 30–50 values each (docs conflict; test near the boundary). `VariationSpecificPictureSet` holds up to 12 images. **Per-variation images vary along one axis only** - images can change by Team *or* by Size, not both.
+
+**Shipping:** default listings to **shipping-enabled**. Only shipping-enabled eBay listings are eligible to surface on Facebook Marketplace through eBay's Meta partner integration - that's free distribution for zero extra work. Local-pickup-only listings are excluded.
+
+**Isolate the XML.** Keep all Trading calls behind an internal `createListing(item)` interface. eBay decommissions Trading calls piecemeal, roughly quarterly, with ~10–12 months notice. Contained module = contained migration.
+
+**Facebook Marketplace via eBay:** opt-out by default, no cost, US included. eBay and Meta select which listings surface based on trends and listing quality. Frame this to the user as a bonus, never a guarantee - there's no control over which items appear and no Marketplace-side analytics.
+
+## Etsy - API
+
+**Eligibility first.** Etsy accepts only handmade, 20+ year vintage, and craft supplies. Check classification before generating anything - resale items and third-party designs are blocked (see `guardrails.md`).
+
+**Auth:** `x-api-key` header **plus** an OAuth 2.0 bearer token. OAuth uses authorization code with **mandatory PKCE** (`S256`). Access token 1 hour, refresh ~90 days. Scope `listings_w` to create.
+
+**App tier:** the **Seller App** track approves in minutes for a seller working on their own shop. Personal and Commercial tracks involve real review - not needed here.
+
+**No sandbox.** Development happens against the live shop at **$0.20 per listing**. Use draft state aggressively; never publish during development.
+
+**Create flow:** `createDraftListing` → `uploadListingImage` → `updateListingInventory` → `updateListing` with `state: "active"`.
+
+Required on create: `quantity`, `title`, `description`, `price`, `who_made`, `when_made`, `taxonomy_id`. Physical items also need `shipping_profile_id` and **`readiness_state_id`** - the latter is a common breakage source since Processing Profiles launched; a listing without a properly assigned shipping profile returns a null readiness state and then fails on update.
+
+**Variations:** `updateListingInventory` with a `products[]` array; each product is one purchasable combination of `property_values` plus `offerings`. Usable properties are driven by `taxonomy_id` - discover with `getPropertiesByTaxonomyId`. Prefer predefined `value_ids` over freeform `values` so variations appear in buyer-facing search filters. **Max 2 variation properties** (3 in preview, not generally available).
+
+**Personalization** is a **separate two-step call**, not part of `createDraftListing`:
+`POST /v3/application/shops/{shop_id}/listings/{listing_id}/personalization?supports_multiple_personalization_questions=true`
+
+Up to 5 questions. Types: `text_input`, `dropdown`, `unlabeled_upload`, `labeled_upload` - max one upload-type question per listing. `question_text` 1–45 chars, `instructions` ≤120 chars, `max_allowed_characters` 1–1024, dropdown options ≤30. `add_on_price` ($0.20–$500) is allowed **only** on optional `text_input` questions.
+
+**Cost:** $0.20 per listing, valid 4 months, charged **per listing not per variation** - so a 30-variant listing costs $0.20 total. Plus 6.5% transaction fee. A bug that mass-creates listings costs real money; validate before publishing.
+
+**Rate limits:** 5 QPS, 5,000 QPD (confirmed on a live personal app, 2026-08-19). Etsy's docs cite higher figures as examples - trust the number shown on the app's own dashboard.
+
+## Square - API
+
+**Auth: personal access token** from the Developer Console. No OAuth server, no app review, no approval gate for a seller's own account. Lowest friction of any destination. Separate sandbox and production tokens - mixing them is an auth error.
+
+**Create:** `upsertCatalogObject` / `batchUpsertCatalogObjects` (≤1,000 objects/batch). An `ITEM` **must** have at least one `ITEM_VARIATION`. Use `#`-prefixed temporary IDs to reference new objects within one request; include an `idempotency_key`.
+
+**Variations:** prefer **item options** - create `CATALOG_ITEM_OPTION` + `ITEM_OPTION_VAL` objects, then reference `item_option_id` + `item_option_value_id` per variation. Square auto-generates a variation for every combination and composes display names. Freeform variation names lead to the inconsistency Square itself warns about. Max **250 variations** per item.
+
+**Images:** `CreateCatalogImage` (multipart), attached by `object_id`. Use `image_ids` - `ecom_uri` and `ecom_image_uris` are deprecated.
+
+**⚠️ Online visibility is not settable via API.** `CatalogItem.channels` is read-only, and `ecom_visibility` is undocumented. The only known path is a one-time **Dashboard → Items & Orders → Settings → item defaults** configuration setting new items to **Listed** and assigning them to the Square Online site. **This is unverified and has reliability complaints - test it empirically before relying on it** (see the test protocol in the planning doc). If it fails, Square degrades to "creates the item, user flips visibility manually."
+
+Additional requirements for an item to actually be buyable online, all outside the Catalog API: assigned to an online sales channel, every variation priced, stock tracked, fulfillment methods configured, and **the user must click Publish** in the site editor.
+
+**Custom-order capable listings:** `CatalogModifierList` with `modifier_type: "TEXT"` (fields `max_length`, `text_required`) captures buyer-entered text at checkout. Works on Square Online; **not** on Payment Links. Note for the user at setup: the entered text is **not retrievable via the Orders API** - they'll read it off the order ticket or receipt. Verify with one real test order.
+
+**Bulk-pack variations** ("25-pack", "50-pack") are the simplest path to self-serve bulk orders and need no special API support - they're just variations with their own prices.
+
+**Facebook Shops + Instagram via Square:** Dashboard → **Channels → Meta for Business**. Official, self-serve, $0. Catalog updates sync automatically. Requires a Meta Business Manager account, a Facebook business page, a Meta catalog, and domain verification. Note this reaches **Shops and Instagram Shopping - not Marketplace**, which is a separate surface. Meta phased out native Shops checkout in 2025, so this drives traffic to Square Online checkout rather than transacting in-app.
+
+## Facebook Marketplace - browser
+
+No API. Drive Chrome to fill the create form completely - photos uploaded, title, description, price, category, condition, location - then **stop before submit**.
+
+Never click submit. The user reviews and publishes.
+
+**Constraints:**
+- ~50 listings/day practical ceiling; space listings several minutes apart
+- Meta bans C2C sellers who "sell as a business" - a high volume of similar listings from one personal account is that signature. For catalog-scale posting, Square → Meta (Shops/Instagram) is the right channel instead; Marketplace is best for individual higher-interest local-pickup items.
+- The form changes; expect breakage. A Marketplace failure must never block API destinations.
+
+**Out of bounds:** no IP rotation, no fingerprint randomization, no CAPTCHA circumvention, no timing patterns tuned to defeat bot detection. Filling a form in the user's own logged-in session is a different act from circumventing access controls - and in practice, evasion engineering is what turns soft enforcement into a terminated account.
+
+## Not supported
+
+| Platform | Why |
+|---|---|
+| **Amazon** | BSA §19 Agent Policy (2026-03-04) requires automated agents to self-identify, which is disqualifying for browser automation. Amazon Custom's customization layer has no API at all. Consequences include permanent withholding of funds. |
+| **OfferUp** | ToS bans automation *and* third-party applications without written consent. |
+| **Craigslist** | ToS names posting software and carves out only "general purpose web browsers." $1,000/violation liquidated damages with an actual litigation record. Bulk API excludes for-sale-by-owner. |
+| **Mercari / Poshmark** | No listing API. Extension-only. |
+| **Nextdoor** | FSF API exists but access terms exclude "promoting your own business." |
