@@ -55,6 +55,20 @@ Guidance that holds on Etsy **inverts** on eBay, so do not apply one platform's 
 
 The residual eBay risk is usually not the resold branded object. It is any **manufactured** element bearing a third-party mark or image.
 
+## Generic naming: what it buys and what it does not
+
+Sellers reach for this reflexively. It is a real mitigation and it is routinely over-trusted, so be precise about all three parts.
+
+**What it does.** Most first-pass enforcement is keyword sweeping. Rights holders and platform trust teams search brand terms and act on what comes back. A listing titled "Football Helmet Display Tile" does not surface in a sweep for "NFL." That is a genuine reduction in the odds of being found, and it is why the Etsy guidance above says to keep brand names out of titles and tags.
+
+**What it does not do.** It does not change the underlying position. The mark is on the product and the product is in the photo, and image matching is standard at both eBay and Etsy. A generic title on an infringing item is a quieter listing, not a cleaner one. Never present it to the seller as having resolved anything.
+
+**What it costs.** The searches being avoided are the same searches that find the item. Nobody types "football helmet display tile." They type "Cowboys coaster." Genericizing all the way down to a category word like "Sports" strips essentially all buyer intent out of the listing, which is a strictly worse trade than not listing at all: risk barely moves, traffic goes to zero.
+
+**The collision with variation listings.** A one-listing-many-teams structure puts the team on a variation axis, and variation values are indexed and searchable exactly like titles. A generic title above a dropdown reading Cowboys, Steelers, Packers achieves close to nothing. Genericizing the values too leaves the buyer unable to tell what they are buying.
+
+**The usable middle.** City and region names are not the league's marks. "Dallas," "Pittsburgh," "Green Bay" carry most of the buyer intent, read naturally in a dropdown, and stay clear of a sweep for team names. This is the version worth recommending when a seller asks. Say plainly that it lowers detection odds and changes nothing else.
+
 ## Output format
 
 Present a recommendation, not a menu. Name the destination, give the reason, and flag anything the seller is accepting.
@@ -80,6 +94,17 @@ Post here? [confirm / change destinations]
 ```
 
 Every recommendation carries **where, why, why not the others, and what is being accepted.** The seller overrides freely; that is the design, not a failure of it.
+
+**For a multi-destination batch, lead with a table in the conversation**, then expand in prose underneath. Prose alone does not let a seller compare four destinations at a glance, and comparing is the whole task.
+
+| Destination | Price there | Structure | Listings | Risk being accepted |
+|---|---|---|---|---|
+| Square | $18.00 | One listing, 26 variants | 1 | Seller's own channel |
+| eBay | $18.00 | One listing, 26 variants | 1 | BLOCK override, manufactured IP |
+| Etsy | $24.00 | One listing, 26 variants | 1 | Two BLOCK overrides |
+| FB Marketplace | $18.00 | No variation support | 26 | Business-pattern signature |
+
+**`Structure` is the column that gets skipped and should not be.** One variation listing versus N separate listings is a different amount of work, a different amount of exposure, and a different answer per platform for the same item. A seller reading "post to all four" has no idea they just agreed to 26 hand-filled forms unless the table says so.
 
 ## Override policy
 

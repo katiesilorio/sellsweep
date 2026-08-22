@@ -59,7 +59,7 @@ If setup is already complete, just load `.env` and `seller_profile.md` and conti
 - Keywords / key features
 - Disclaimers (condition notes, made-to-order timing, etc.)
 
-**Assess photo quality before generating anything.** Check resolution, blur, lighting, background clutter, and whether the item is fully in frame. Flag problems and suggest a re-shoot. Image quality drives conversion directly, and eBay selects listings for Facebook Marketplace surfacing partly on "listing quality" - so a bad photo costs reach, not just clicks.
+**Assess photo quality before generating anything.** Check resolution, blur, lighting, background clutter, and whether the item is fully in frame. Apply EXIF transpose before judging orientation - a raw pixel read makes a correctly-tagged batch look uniformly rotated, and reporting that as a defect is a false alarm the seller can immediately disprove. Flag problems and suggest a re-shoot. Image quality drives conversion directly, and eBay selects listings for Facebook Marketplace surfacing partly on "listing quality" - so a bad photo costs reach, not just clicks.
 
 **Photos must be the user's own.** Never use a supplier's catalog image, a manufacturer photo, or a studio still. This is a separate infringement from anything about the product itself, and it is the most common cause of takedowns on items that are otherwise perfectly legal to sell. If the user supplies an image that looks like stock or catalog photography, flag it.
 
@@ -74,7 +74,11 @@ These vary independently. A hand-made team-logo tile is user-made *and* IP-beari
 
 ### Step 4 - Research price
 
-Read `references/pricing.md`. Cascade, in order, stopping when you have enough:
+Read `references/pricing.md`.
+
+**Decide the product framing before pulling any comps.** The same object can sit in two different comp bands depending on what it is called - a tile with an easel is display decor at $16 to $26 or a coaster at $3 to $5. Framing moves the number further than anything decided inside the band, and comps pulled against the wrong frame produce a confident, unspottable error. Record the chosen framing next to the tier.
+
+Then cascade, in order, stopping when you have enough:
 
 0. **The seller's own sales history** (`sales_log.csv`), where 5 or more sales match on item type, material, and theme
 1. Licensed comps API, where the vertical is covered
@@ -124,6 +128,13 @@ Read `references/routing.md`.
 Weigh six factors, not just IP: provenance, IP status, price point, audience match, shipping economics, and repeatability. They trade off against each other, and price or shipping can veto an otherwise good audience fit.
 
 Present a recommendation with **where, why, why not the others, and what risk is being accepted.** Never present a bare menu of platforms.
+
+**Put it in the conversation as a table, before building anything.** Not buried in a generated file, and not after the listing copy is already written - the seller decides destinations before the work is done, not after it. One row per destination, carrying at minimum:
+
+| Destination | Price there | Structure | Listings | Risk being accepted |
+|---|---|---|---|---|
+
+`Structure` is the one people forget: a single variation listing and N separate listings are completely different amounts of work and completely different exposure, and the answer differs per platform even for the same item. The generated file is where the full detail lives. The table in chat is where the decision actually gets made.
 
 The seller overrides freely. That is the design.
 

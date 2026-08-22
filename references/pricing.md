@@ -13,6 +13,23 @@ Work down until you have enough. Always record which tier produced the number.
 | 4 | Etsy `findAllListingsActive` | `api_key` only | Active asking prices, keyword/taxonomy/price-range filtered |
 | 5 | Model judgment with an explicit range | Always | The floor. Never silently absent. |
 
+## Frame the product before you pull comps
+
+**Decide what the item *is* before deciding what it costs.** Framing moves the comp band further than any decision made inside the band, and comps pulled against the wrong frame produce a confidently wrong number - the failure mode this file exists to prevent.
+
+A 4.25 inch gloss ceramic tile with a cork back and a wooden easel is two products at once:
+
+| Framing | Comp band | What buyers search |
+|---|---|---|
+| Coaster | $3 to $5 single, $10 to $22 per set of 4 | "team coasters" |
+| Decorative tile with easel | $16 to $26 | "team decor", "desk sign" |
+
+Same object, same blank, same labor. Calling it a coaster costs roughly $13 a unit.
+
+The tell is usually an accessory. An easel, stand, frame, or hanger signals display, and display prices above utility. When an item ships with one, lead the title with the display framing and mention the utility use second, so the listing sits in the higher band while still catching the lower-band search.
+
+Do this before any lookup, and record the chosen framing next to the tier. A price that is right for the wrong frame is not an error the seller can catch by looking at the number.
+
 ## Tier 0 - the seller's own history
 
 Handmade goods have no external comp worth trusting. A hand-poured coaster from a single seller is not in PriceCharting, and eBay's closest match is somebody else's mass-produced coaster. What the seller does have, eventually, is their own record.

@@ -43,6 +43,12 @@ Per item, choose the best as primary - sharpest, best-lit, fully in frame, clean
 
 Flag quality problems now, before generating copy: blur, harsh shadows, cluttered background, item cropped, personal items visible in frame.
 
+**Judge orientation only after applying EXIF transpose.** Phone photos are routinely stored with the pixels in one orientation plus an EXIF `Orientation` tag telling the viewer to rotate them. Finder, Photos, and every major marketplace honor that tag, so the seller sees them upright and so will buyers. A naive image read does not honor it. Reading raw pixels will make a perfectly good batch look like every photo is rotated 90 degrees.
+
+**Never tell a seller their photos are sideways on the basis of a raw pixel read.** Call `ImageOps.exif_transpose()` first, then judge. Getting this backwards means confidently reporting a defect that does not exist, in a batch the seller can see is fine, which costs trust on everything else in the run.
+
+What *is* worth doing: bake the orientation into the pixels and drop the tag before upload, so the image stays correct on an upload path that strips EXIF. Describe that to the seller as robustness, not as a fix.
+
 **Reject supplier, manufacturer, studio, and stock photography.** If an image looks like catalog work rather than something the user shot, say so. Using it is a separate infringement from anything about the product itself, and it's the most common cause of takedowns on items that are otherwise perfectly legal to sell.
 
 ### Step 3 - Ask in one consolidated pass

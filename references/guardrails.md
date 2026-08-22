@@ -29,6 +29,8 @@ If validation fails, say which rule and which item. Do not silently truncate a t
 
 ### BLOCK level
 
+**BLOCK does not mean refuse.** Every rule in this section is overridable. BLOCK means stop, name the specific rights holder and the specific consequence, and get an explicit yes for that item before posting. The skill does not decline to post something the seller has knowingly chosen to post. Read the level as "stop and ask," never as "not available" - saying a destination is unavailable when the seller can in fact choose it is a misread of this file.
+
 | Rule | Trigger | Consequence if overridden |
 |---|---|---|
 | Etsy resale ban | provenance = resale, destination = Etsy | Policy violation → shop strike. Applies **even to legally resold authentic goods** - Etsy's rule is stricter than the law. |
