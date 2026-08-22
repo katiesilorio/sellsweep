@@ -13,7 +13,7 @@ Both are git-tracked in the **private** repo. Git history is the audit trail: ev
 
 **1. Know where everything is.** One physical item can be live on four marketplaces at once. When it sells on one, it has to come down from the other three, fast. Nothing else in the system knows all four placements at the same time.
 
-**2. Price new items from real history.** A hand-poured rooster coaster made by one seller in El Paso is not in PriceCharting and has no meaningful eBay comp. What it *does* have, after enough sales, is the seller's own record: this material, this size, this theme, sold for this much, in this many days, on this platform. That is a better comp than anything external.
+**2. Price new items from real history.** A hand-poured coaster made by a single seller is not in PriceCharting and has no meaningful eBay comp. What it *does* have, after enough sales, is the seller's own record: this material, this size, this theme, sold for this much, in this many days, on this platform. That is a better comp than anything external.
 
 **Job 2 does not work yet and will not for months.** With a handful of sales the ledger has no pricing power, and pretending otherwise produces confident nonsense. Below **5 matching sales**, do not use it as a comp tier at all. Say so plainly rather than dressing up a single data point.
 
@@ -43,10 +43,29 @@ A variation listing is **one listing with N variants** on every platform that su
 | `personalizable` | Personalized work commands a premium. Comparing it against stock work skews both. |
 | `days_listed` (sales log) | The real signal. Sold in 3 days means underpriced. Sold in 200 means overpriced. Price alone cannot tell you which. |
 | `cost_basis` | Optional and usually blank. When present it turns the ledger from a price log into a margin tool. |
+| `stock_location` | `home` `booth` `split`. Where the item physically sits. Not a nicety: see below. |
 | `{platform}_price` | Prices genuinely differ per platform. Etsy bakes shipping into the price, eBay does not. Store what was actually listed, not what was derived. |
 | `status` | `draft` `active` `sold` `delisted` `archived` |
 
 **There are no buyer fields, and there must never be.** No name, address, email, or order ID. The eBay Marketplace Account Deletion exemption is filed under *"I do not persist eBay data"* and that claim is only true while this holds. Adding a buyer column silently makes a filed attestation false.
+
+## Stock location, and why it is not a nicety
+
+A seller with a physical booth *and* an online shop has two ways to lose the same item, not one.
+
+1. **It sells online while it is sitting at the booth.** Now he has to drive there and collect it before he can pack it. If the booth is only staffed some days, the handling time promised on the listing is already wrong.
+2. **It sells at the booth, in cash, while the online listing is still live.** Nothing tells the online catalog. The next online buyer purchases something that is already gone.
+
+The second one is worse and it has no API. A card reader sale through Square decrements Square's own stock, but a cash sale at a booth decrements nothing anywhere.
+
+So:
+
+- **`booth` items should be listed conservatively.** Prefer the seller's own channels, and avoid a quantity-of-one eBay listing where a cancellation creates an account defect.
+- **`home` items are the safe ones to push everywhere.** He can see them and pack them the same day.
+- **`split` means the count is spread across two places** and the quantity here is the total. Treat it as the least trustworthy number in the file, because reconciling it depends on someone counting.
+- **Repeatable items dissolve the problem.** If he can make another, quantity stops being 1 and location stops mattering. Same conclusion the delist rule reaches from the other direction.
+
+**At intake, ask where the item is.** Once per batch, not once per item.
 
 ## When the skill reads
 

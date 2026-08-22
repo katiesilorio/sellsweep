@@ -81,6 +81,18 @@ Get `shop_id` from `GET /v3/application/users/me`.
 
 No tokens, nothing in `.env`. The operator logs into Facebook in Chrome themselves; the skill drives the already-authenticated session and **stops before submit**.
 
+**Verified working end to end 2026-08-22** against a real listing. Three things that will break a naive run:
+
+**1. The form reflows after photo upload.** Title and Price sit above the photo tiles before upload and shift down after. Coordinate clicks that were correct a second earlier land on the wrong field, silently. **Use element refs from `find` or `read_page`, never coordinates, for every field on this form.**
+
+**2. Photos must be staged into the session first.** The uploader rejects any path the session cannot read, so a device path like `~/Desktop/IMG1.jpeg` fails outright. Stage the files first, then upload from the staged path. Combined size per call stays under 10 MB, which is roughly 30 phone photos, so a large batch needs chunking.
+
+**3. Category carries a shipping flag.** Some Marketplace categories show *Shipping available* and some are local-pickup-only. Choosing a pickup-only category silently caps reach to the seller's metro. Check the flag before selecting; for home goods, `Home & Garden > Household` supports shipping.
+
+**Field order:** photos, Title, Price, Category, Condition, Description, then optional More details. `Next` stays disabled until Title, Price, Category and Condition are all set, which makes it a reliable completeness check. **`Next` is the stop line.**
+
+**Leave "Draft listings with Meta AI" off.** It rewrites the copy the skill just generated.
+
 **The skill never enters a password.** If a login screen appears, hand it to the operator.
 
 ## Refresh cadence

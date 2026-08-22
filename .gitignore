@@ -42,3 +42,6 @@ _to_delete/
 # Live ledger - the seller-s actual data. Templates live in assets/.
 inventory.csv
 sales_log.csv
+
+# Operational handoff. Names the seller. Private repo only.
+HANDOFF.md

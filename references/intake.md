@@ -4,7 +4,7 @@ Three front doors, one destination. All modes converge on the review CSV.
 
 | Mode | Trigger | Best for |
 |---|---|---|
-| **Chat photos** | User drops images into the conversation | 1–15 items, ad hoc - "my dad just texted me these" |
+| **Chat photos** | User drops images into the conversation | 1-15 items, ad hoc - "someone just texted me these" |
 | **Folder + CSV** | Folder path plus a filled CSV | Large backlog, details already recorded |
 | **Folder only** | Folder path, no CSV | Large backlog, no details yet |
 

@@ -15,7 +15,7 @@ Work down until you have enough. Always record which tier produced the number.
 
 ## Tier 0 - the seller's own history
 
-Handmade goods have no external comp worth trusting. A hand-poured rooster coaster from one seller in El Paso is not in PriceCharting, and eBay's closest match is somebody else's mass-produced coaster. What the seller does have, eventually, is their own record.
+Handmade goods have no external comp worth trusting. A hand-poured coaster from a single seller is not in PriceCharting, and eBay's closest match is somebody else's mass-produced coaster. What the seller does have, eventually, is their own record.
 
 Match on `item_type` + `material` + `design_theme`, and treat `personalizable` as a hard split. Personalized work carries a premium, and mixing it with stock work corrupts both sides of the comparison.
 
