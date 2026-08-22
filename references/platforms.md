@@ -87,7 +87,15 @@ Still outside the Catalog API and still required for an item to transact: every 
 
 **Bulk-pack variations** ("25-pack", "50-pack") are the simplest path to self-serve bulk orders and need no special API support - they're just variations with their own prices.
 
-**Facebook Shops + Instagram via Square:** Dashboard → **Channels → Meta for Business**. Official, self-serve, $0. Catalog updates sync automatically. Requires a Meta Business Manager account, a Facebook business page, a Meta catalog, and domain verification. Note this reaches **Shops and Instagram Shopping - not Marketplace**, which is a separate surface. Meta phased out native Shops checkout in 2025, so this drives traffic to Square Online checkout rather than transacting in-app.
+**Facebook Shops + Instagram via Square:** Dashboard → **Channels → Meta for Business**. Official, self-serve, $0. Requires a Meta Business Manager account, a Facebook business page, a Meta catalog, and domain verification. Reaches **Shops and Instagram Shopping, not Marketplace**, which is a separate browser-driven surface. Meta phased out native Shops checkout in 2025, so this drives traffic to Square Online checkout rather than transacting in-app.
+
+**⛔ Treat this channel as unavailable until proven otherwise, and prove it from the Manage page.** Two failure modes, both seen live on 2026-08-22:
+
+1. **The connection silently breaks.** Square's Channels *list* showed a green **Connected** badge while the channel's own **Manage Channel** page read `Status: Disconnected` with "There was an error authenticating with Meta." The list badge is not trustworthy. Always open Manage and read `Status:` there. Re-authenticating requires the seller to sign in to Meta and click Resolve; never do this for them.
+
+2. **Domain verification is structurally impossible on a Square subdomain.** Meta verifies three ways, a DNS TXT record, an HTML file at the site root, or a meta tag in the page head. A `*.square.site` store gives the seller none of them, so the Verify button can never succeed and product visibility stays capped. Only a custom domain clears it.
+
+**Verify from the public side, not the dashboard.** An Instagram profile with Shopping live shows a fourth tab, Shop, alongside Posts, Reels and Tagged. If it shows three, nothing is syncing regardless of what any badge says.
 
 ## Facebook Marketplace - browser
 
